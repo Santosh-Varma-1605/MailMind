@@ -10,6 +10,10 @@ const aiRoutes = require('./routes/ai');
 
 const app = express();
 
+const isProd = process.env.NODE_ENV === 'production';
+
+app.set('trust proxy', 1);
+
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
@@ -21,7 +25,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    secure: isProd,       // HTTPS only in production
+    sameSite: isProd ? 'none' : 'lax',  // 'none' required for cross-domain
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   },
 }));
 
