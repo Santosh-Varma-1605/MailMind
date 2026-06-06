@@ -6,14 +6,14 @@ import { api } from '../services/api';
 import styles from './InboxPage.module.css';
 
 const TABS = [
-  { key: 'inbox', label: 'Inbox' },
   { key: 'important', label: 'Important' },
+  { key: 'inbox', label: 'Inbox' },
 ];
 
 export default function InboxPage() {
   const { user, logout } = useAuth();
 
-  const [tab, setTab] = useState('inbox');
+  const [tab, setTab] = useState('important');
   const [emails, setEmails] = useState([]);
   const [nextPageToken, setNextPageToken] = useState(null);
   const [loading, setLoading] = useState(true);
