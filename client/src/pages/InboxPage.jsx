@@ -24,6 +24,11 @@ export default function InboxPage() {
   const [emailDetail, setEmailDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  // Mobile panel state: 'sidebar' | 'list' | 'detail'
+  const [mobilePanel, setMobilePanel] = useState('list');
+
+  const isMobile = () => window.innerWidth <= 768;
+
   const fetchEmails = useCallback(async (activeTab, pageToken = null) => {
     if (pageToken) setLoadingMore(true);
     else setLoading(true);
@@ -52,6 +57,7 @@ export default function InboxPage() {
     setSelectedEmail(email);
     setDetailLoading(true);
     setEmailDetail(null);
+    if (isMobile()) setMobilePanel('detail');
     try {
       const full = await api.getEmail(email.id);
       setEmailDetail(full);
@@ -62,10 +68,15 @@ export default function InboxPage() {
     }
   };
 
+  const handleTabChange = (key) => {
+    setTab(key);
+    if (isMobile()) setMobilePanel('list');
+  };
+
   return (
     <div className={styles.root}>
       {/* Sidebar */}
-      <aside className={styles.sidebar}>
+      <aside className={`${styles.sidebar} ${mobilePanel === 'sidebar' ? styles.sidebarOpen : ''}`}>
         <div className={styles.brand}>
           Mail<span>Mind</span>
         </div>
@@ -75,7 +86,7 @@ export default function InboxPage() {
             <button
               key={t.key}
               className={`${styles.tabBtn} ${tab === t.key ? styles.tabActive : ''}`}
-              onClick={() => setTab(t.key)}
+              onClick={() => handleTabChange(t.key)}
             >
               {t.key === 'inbox' ? (
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -112,8 +123,31 @@ export default function InboxPage() {
         </div>
       </aside>
 
+      {/* Mobile top bar */}
+      <div className={styles.mobileBar}>
+        <button
+          className={styles.mobileIconBtn}
+          onClick={() => setMobilePanel(p => p === 'sidebar' ? 'list' : 'sidebar')}
+          title="Menu"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+        <span className={styles.mobileBrand}>Mail<em>Mind</em></span>
+        <button className={styles.mobileIconBtn} onClick={logout} title="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </div>
+
       {/* Email list panel */}
-      <div className={styles.listPanel}>
+      <div className={`${styles.listPanel} ${mobilePanel === 'list' ? styles.mobileVisible : ''}`}>
         <div className={styles.listHeader}>
           <h2 className={styles.listTitle}>
             {tab === 'inbox' ? 'Inbox' : 'Important'}
@@ -124,7 +158,7 @@ export default function InboxPage() {
             disabled={loading}
             title="Refresh"
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: loading ? 'rotate(360deg)' : 'none', transition: 'transform 0.5s' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="23 4 23 10 17 10"/>
               <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
             </svg>
@@ -149,7 +183,17 @@ export default function InboxPage() {
       </div>
 
       {/* Detail panel */}
-      <div className={styles.detailPanel}>
+      <div className={`${styles.detailPanel} ${mobilePanel === 'detail' ? styles.mobileVisible : ''}`}>
+        {/* Mobile back button */}
+        {mobilePanel === 'detail' && (
+          <button className={styles.backBtn} onClick={() => setMobilePanel('list')}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+            Back
+          </button>
+        )}
+
         {detailLoading && (
           <div className={styles.detailLoading}>
             <div className={styles.spinner} />

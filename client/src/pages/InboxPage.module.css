@@ -23,10 +23,7 @@
   padding: 0 20px 24px;
   letter-spacing: -0.3px;
 }
-.brand span {
-  font-style: italic;
-  color: var(--text);
-}
+.brand span { font-style: italic; color: var(--text); }
 
 .tabs {
   display: flex;
@@ -51,10 +48,7 @@
   width: 100%;
 }
 .tabBtn:hover { background: var(--surface2); color: var(--text); }
-.tabActive {
-  background: var(--accent-dim) !important;
-  color: var(--accent-hover) !important;
-}
+.tabActive { background: var(--accent-dim) !important; color: var(--accent-hover) !important; }
 
 .sidebarSpacer { flex: 1; }
 
@@ -67,55 +61,27 @@
   margin-top: 8px;
 }
 
-.avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
+.avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; }
 
-.userInfo {
-  flex: 1;
-  min-width: 0;
-}
-.userName {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.userEmail {
-  font-size: 11px;
-  color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+.userInfo { flex: 1; min-width: 0; }
+.userName { font-size: 12.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.userEmail { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .logoutBtn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  transition: color 0.12s, background 0.12s;
+  background: none; border: none; color: var(--muted);
+  padding: 4px; border-radius: 4px; display: flex; align-items: center;
+  flex-shrink: 0; transition: color 0.12s, background 0.12s;
 }
 .logoutBtn:hover { color: var(--red); background: var(--red-dim); }
 
-/* ── Email list panel ── */
+/* ── List panel ── */
 .listPanel {
   width: 320px;
   flex-shrink: 0;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;      /* change this to: */
-  overflow-y: auto;      /* ← this line */
+  overflow-y: auto;
 }
 
 .listHeader {
@@ -127,68 +93,50 @@
   flex-shrink: 0;
 }
 
-.listTitle {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text);
-}
+.listTitle { font-size: 15px; font-weight: 600; color: var(--text); }
 
 .refreshBtn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  padding: 4px;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  transition: color 0.12s;
+  background: none; border: none; color: var(--muted);
+  padding: 4px; border-radius: 4px; display: flex;
+  align-items: center; transition: color 0.12s;
 }
 .refreshBtn:hover:not(:disabled) { color: var(--text); }
 .refreshBtn:disabled { opacity: 0.4; }
 
 .errorBanner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  margin: 8px 12px 0;
-  padding: 8px 12px;
-  background: var(--red-dim);
-  border: 1px solid rgba(248,113,113,0.25);
-  border-radius: var(--radius-sm);
-  color: var(--red);
-  font-size: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 8px; margin: 8px 12px 0; padding: 8px 12px;
+  background: var(--red-dim); border: 1px solid rgba(248,113,113,0.25);
+  border-radius: var(--radius-sm); color: var(--red); font-size: 12px;
 }
-.errorBanner button {
-  background: none;
-  border: none;
-  color: var(--red);
-  font-size: 12px;
-  text-decoration: underline;
-  padding: 0;
-}
+.errorBanner button { background: none; border: none; color: var(--red); font-size: 12px; text-decoration: underline; padding: 0; }
 
 /* ── Detail panel ── */
-.detailPanel {
-  flex: 1;
-  overflow-y: auto;
-  min-width: 0;
+.detailPanel { flex: 1; overflow-y: auto; min-width: 0; }
+
+.backBtn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent-hover);
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+  cursor: pointer;
 }
 
 .detailLoading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  height: 100%;
-  color: var(--muted);
-  font-size: 13px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; height: 200px;
+  color: var(--muted); font-size: 13px;
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
+  width: 24px; height: 24px;
   border: 2px solid var(--border2);
   border-top-color: var(--accent);
   border-radius: 50%;
@@ -197,12 +145,71 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .emptyDetail {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  height: 100%;
-  color: var(--muted);
-  font-size: 13px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 14px; height: 100%;
+  color: var(--muted); font-size: 13px;
+}
+
+/* ── Mobile top bar (hidden on desktop) ── */
+.mobileBar { display: none; }
+.mobileIconBtn {
+  background: none; border: none; color: var(--muted2);
+  padding: 6px; display: flex; align-items: center;
+  border-radius: var(--radius-sm); transition: color 0.12s;
+}
+.mobileIconBtn:hover { color: var(--text); }
+.mobileBrand {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--accent-hover);
+  flex: 1;
+  text-align: center;
+}
+.mobileBrand em { font-style: italic; color: var(--text); }
+
+/* ── Mobile responsive ── */
+@media (max-width: 768px) {
+  .root { flex-direction: column; }
+
+  /* Show top bar */
+  .mobileBar {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    gap: 8px;
+  }
+
+  /* Hide sidebar by default, show as overlay when open */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+    width: 240px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    padding-top: 48px;
+  }
+  .sidebarOpen { transform: translateX(0); }
+
+  /* List and detail panels take full screen, hidden by default */
+  .listPanel {
+    width: 100%;
+    flex: 1;
+    display: none;
+    border-right: none;
+  }
+  .detailPanel {
+    width: 100%;
+    flex: 1;
+    display: none;
+  }
+
+  /* Only show the active panel */
+  .mobileVisible { display: flex; flex-direction: column; }
+
+  /* Show back button on detail panel */
+  .detailPanel.mobileVisible .backBtn { display: flex; }
 }
