@@ -4,7 +4,6 @@ const User = require('../models/User');
 const { requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
-// Build an authenticated Gmail client for the current user
 async function getGmailClient(userId) {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found');
@@ -19,7 +18,6 @@ async function getGmailClient(userId) {
     refresh_token: user.refreshToken,
   });
 
-  // Auto-save refreshed tokens
   oauth2Client.on('tokens', async (tokens) => {
     if (tokens.access_token) {
       await User.findByIdAndUpdate(userId, { accessToken: tokens.access_token });
@@ -29,33 +27,70 @@ async function getGmailClient(userId) {
   return { gmail: google.gmail({ version: 'v1', auth: oauth2Client }), user };
 }
 
-// Decode base64url email body
 function decodeBody(data) {
   if (!data) return '';
   return Buffer.from(data.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
 }
 
-// Extract plain text body from a Gmail message payload
-function extractBody(payload) {
-  if (!payload) return '';
-  if (payload.mimeType === 'text/plain' && payload.body?.data) {
-    return decodeBody(payload.body.data);
+// Recursively collect all parts, return { plain, html }
+function collectParts(payload, result = { plain: '', html: '' }) {
+  if (!payload) return result;
+
+  const mime = payload.mimeType || '';
+
+  if (mime === 'text/plain' && payload.body?.data) {
+    result.plain += decodeBody(payload.body.data);
+  } else if (mime === 'text/html' && payload.body?.data) {
+    result.html += decodeBody(payload.body.data);
   }
+
   if (payload.parts) {
     for (const part of payload.parts) {
-      const text = extractBody(part);
-      if (text) return text;
+      collectParts(part, result);
     }
   }
+
+  return result;
+}
+
+// Strip HTML tags to plain text, preserving whitespace/newlines
+function htmlToPlain(html) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/tr>/gi, '\n')
+    .replace(/<\/td>/gi, ' ')
+    .replace(/<\/th>/gi, ' ')
+    .replace(/<li>/gi, '• ')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function extractBody(payload) {
+  const { plain, html } = collectParts(payload);
+  if (plain) return plain;
+  if (html) return htmlToPlain(html);
+  // Last resort: decode top-level body if exists
+  if (payload?.body?.data) return decodeBody(payload.body.data);
   return '';
 }
 
-// Get header value by name
 function getHeader(headers, name) {
   return headers?.find(h => h.name.toLowerCase() === name.toLowerCase())?.value || '';
 }
 
-// Fetch list of emails (inbox or important)
+// Fetch list of emails
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { gmail } = await getGmailClient(req.session.userId);
@@ -73,7 +108,6 @@ router.get('/', requireAuth, async (req, res) => {
     const messages = listRes.data.messages || [];
     const nextPageToken = listRes.data.nextPageToken || null;
 
-    // Fetch metadata for each message (fast — no body yet)
     const emails = await Promise.all(
       messages.map(async (msg) => {
         const detail = await gmail.users.messages.get({
@@ -140,7 +174,6 @@ router.post('/:id/reply', requireAuth, async (req, res) => {
     const { replyText } = req.body;
     if (!replyText) return res.status(400).json({ error: 'No reply text' });
 
-    // Get original to extract headers
     const original = await gmail.users.messages.get({
       userId: 'me',
       id: req.params.id,
@@ -173,10 +206,7 @@ router.post('/:id/reply', requireAuth, async (req, res) => {
 
     await gmail.users.messages.send({
       userId: 'me',
-      requestBody: {
-        raw: encoded,
-        threadId: original.data.threadId,
-      },
+      requestBody: { raw: encoded, threadId: original.data.threadId },
     });
 
     res.json({ ok: true });
